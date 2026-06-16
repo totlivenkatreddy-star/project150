@@ -1,29 +1,71 @@
-from fastapi import FastAPI, Form, Request
+from fastapi import FastAPI, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 app = FastAPI()
 
 # -------------------------
-# SIMPLE SESSION STORAGE
+# SIMPLE SESSION STORE
 # -------------------------
 sessions = {}
 
 # -------------------------
-# LOGIN PAGE
+# LOGIN PAGE (WITH CSS)
 # -------------------------
 @app.get("/", response_class=HTMLResponse)
 def login_page():
     return """
-    <h2>Login Page</h2>
-    <form action="/login" method="post">
-        <input name="username" placeholder="Username"><br><br>
-        <input name="password" type="password" placeholder="Password"><br><br>
-        <button>Login</button>
-    </form>
+    <html>
+    <head>
+        <title>Login</title>
+        <style>
+            body {
+                font-family: Arial;
+                background: #f2f2f2;
+                text-align: center;
+                margin-top: 100px;
+            }
+
+            .box {
+                background: white;
+                padding: 30px;
+                width: 300px;
+                margin: auto;
+                border-radius: 10px;
+                box-shadow: 0px 0px 10px gray;
+            }
+
+            input {
+                width: 90%;
+                padding: 10px;
+                margin: 10px 0;
+            }
+
+            button {
+                width: 100%;
+                padding: 10px;
+                background: green;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="box">
+            <h2>Login</h2>
+            <form action="/login" method="post">
+                <input name="username" placeholder="Username"><br>
+                <input name="password" type="password" placeholder="Password"><br>
+                <button>Login</button>
+            </form>
+        </div>
+    </body>
+    </html>
     """
 
 # -------------------------
-# LOGIN ACTION (CREATE SESSION)
+# LOGIN ACTION
 # -------------------------
 @app.post("/login")
 def login(username: str = Form(...), password: str = Form(...)):
@@ -32,7 +74,8 @@ def login(username: str = Form(...), password: str = Form(...)):
         sessions["user"] = username
         return RedirectResponse("/dashboard", status_code=302)
 
-    return HTMLResponse("<h3>Login Failed ❌</h3><a href='/'>Try again</a>")
+    return HTMLResponse("<h2>Login Failed ❌</h2><a href='/'>Try again</a>")
+
 
 # -------------------------
 # CHECK LOGIN
@@ -40,8 +83,9 @@ def login(username: str = Form(...), password: str = Form(...)):
 def check_login():
     return sessions.get("user")
 
+
 # -------------------------
-# DASHBOARD
+# DASHBOARD (WITH CSS)
 # -------------------------
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard():
@@ -49,14 +93,78 @@ def dashboard():
         return RedirectResponse("/")
 
     return """
-    <h2>Dashboard</h2>
+    <html>
+    <head>
+        <title>Dashboard</title>
+        <style>
+            body { margin:0; font-family:Arial; }
 
-    <a href="/profile">Profile</a> |
-    <a href="/orders">Orders</a> |
-    <a href="/settings">Settings</a> |
-    <a href="/logout">Logout</a>
+            .header {
+                background:#2c3e50;
+                color:white;
+                padding:15px;
+                display:flex;
+                justify-content:space-between;
+            }
 
-    <h3>Welcome Venkat 👋</h3>
+            .menu a {
+                color:white;
+                margin:0 15px;
+                text-decoration:none;
+                font-weight:bold;
+            }
+
+            .content {
+                text-align:center;
+                margin-top:80px;
+            }
+
+            .card {
+                display:inline-block;
+                padding:20px;
+                margin:10px;
+                background:#f4f4f4;
+                border-radius:10px;
+                width:150px;
+                cursor:pointer;
+            }
+
+            .footer {
+                position:fixed;
+                bottom:0;
+                width:100%;
+                background:#2c3e50;
+                color:white;
+                text-align:center;
+                padding:10px;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="header">
+            <div><b>Dashboard</b></div>
+            <div class="menu">
+                <a href="/profile">👤 Profile</a>
+                <a href="/orders">📦 Orders</a>
+                <a href="/settings">⚙ Settings</a>
+                <a href="/logout">🚪 Logout</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <h1>Welcome Venkat 👋</h1>
+
+            <a href="/profile"><div class="card">👤 Profile</div></a>
+            <a href="/orders"><div class="card">📦 Orders</div></a>
+            <a href="/settings"><div class="card">⚙ Settings</div></a>
+        </div>
+
+        <div class="footer">© 2026 FastAPI App</div>
+
+    </body>
+    </html>
     """
 
 # -------------------------
@@ -110,7 +218,7 @@ def settings():
     """
 
 # -------------------------
-# LOGOUT (CLEAR SESSION)
+# LOGOUT
 # -------------------------
 @app.get("/logout")
 def logout():
