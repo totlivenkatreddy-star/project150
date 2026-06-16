@@ -21,3 +21,16 @@ def login_page():
         <button type="submit">Login</button>
     </form>
     """
+@app.post("/login", response_class=HTMLResponse)
+def login(username: str = Form(...), password: str = Form(...)):
+
+    if username == "admin" and password == "1234":
+        return """
+        <h2>Login Successful ✅</h2>
+        <a href="/">Go back</a>
+        """
+
+    return """
+    <h2>Login Failed ❌</h2>
+    <a href="/">Try again</a>
+    """
