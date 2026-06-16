@@ -1,24 +1,11 @@
-from fastapi import FastAPI, Request
-from fastapi.templating import Jinja2Templates
-import os
+from fastapi import FastAPI
 
-print("CURRENT DIR:", os.getcwd())
-
-app = FastAPI()
-
-# Database / data
-students = [{"name": "venkatreddy"}]
-
-# IMPORTANT: make sure engine + Base are imported correctly
-Base.metadata.create_all(bind=engine)
-
-# Templates setup
-templates = Jinja2Templates(directory="templates")
-
+app= FastAPI()
 
 @app.get("/")
-def home(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request}
-    )
+def home_main():
+    return {"welcome":"home"}
+
+
+
+
