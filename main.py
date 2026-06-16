@@ -1,7 +1,12 @@
-from fastapi import FastAPI, Form
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Form, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 app = FastAPI()
+
+# -------------------------
+# SIMPLE SESSION STORAGE
+# -------------------------
+sessions = {}
 
 # -------------------------
 # LOGIN PAGE
@@ -9,162 +14,105 @@ app = FastAPI()
 @app.get("/", response_class=HTMLResponse)
 def login_page():
     return """
-    <html>
-    <head>
-        <title>Login</title>
-        <style>
-            body { font-family: Arial; text-align:center; background:#f2f2f2; margin-top:100px; }
-            .box { background:white; padding:30px; width:300px; margin:auto; border-radius:10px; }
-            input { width:90%; padding:10px; margin:10px; }
-            button { width:100%; padding:10px; background:green; color:white; border:none; }
-        </style>
-    </head>
-    <body>
-        <div class="box">
-            <h2>Login</h2>
-            <form action="/login" method="post">
-                <input name="username" placeholder="Username"><br>
-                <input name="password" type="password" placeholder="Password"><br>
-                <button>Login</button>
-            </form>
-        </div>
-    </body>
-    </html>
+    <h2>Login Page</h2>
+    <form action="/login" method="post">
+        <input name="username" placeholder="Username"><br><br>
+        <input name="password" type="password" placeholder="Password"><br><br>
+        <button>Login</button>
+    </form>
     """
 
 # -------------------------
-# LOGIN CHECK
+# LOGIN ACTION (CREATE SESSION)
 # -------------------------
-@app.post("/login", response_class=HTMLResponse)
+@app.post("/login")
 def login(username: str = Form(...), password: str = Form(...)):
 
     if username == "venkat" and password == "1234":
-        return dashboard()
+        sessions["user"] = username
+        return RedirectResponse("/dashboard", status_code=302)
 
-    return "<h2>Login Failed ❌ <a href='/'>Try again</a></h2>"
-
+    return HTMLResponse("<h3>Login Failed ❌</h3><a href='/'>Try again</a>")
 
 # -------------------------
-# DASHBOARD PAGE
+# CHECK LOGIN
 # -------------------------
+def check_login():
+    return sessions.get("user")
+
+# -------------------------
+# DASHBOARD
+# -------------------------
+@app.get("/dashboard", response_class=HTMLResponse)
 def dashboard():
+    if not check_login():
+        return RedirectResponse("/")
+
     return """
-    <html>
-    <head>
-        <title>Dashboard</title>
-        <style>
-            body { margin:0; font-family:Arial; }
+    <h2>Dashboard</h2>
 
-            .header {
-                background:#2c3e50;
-                color:white;
-                padding:15px;
-                display:flex;
-                justify-content:space-between;
-            }
+    <a href="/profile">Profile</a> |
+    <a href="/orders">Orders</a> |
+    <a href="/settings">Settings</a> |
+    <a href="/logout">Logout</a>
 
-            .menu a {
-                color:white;
-                margin:0 15px;
-                text-decoration:none;
-                font-weight:bold;
-                cursor:pointer;
-            }
-
-            .content {
-                text-align:center;
-                margin-top:80px;
-            }
-
-            .card {
-                display:inline-block;
-                padding:20px;
-                margin:10px;
-                background:#f4f4f4;
-                border-radius:10px;
-                cursor:pointer;
-                width:150px;
-            }
-
-            .footer {
-                position:fixed;
-                bottom:0;
-                width:100%;
-                background:#2c3e50;
-                color:white;
-                text-align:center;
-                padding:10px;
-            }
-        </style>
-    </head>
-
-    <body>
-
-        <div class="header">
-            <div><b>Dashboard</b></div>
-            <div class="menu">
-                <a href="/profile">👤 Profile</a>
-                <a href="/orders">📦 Orders</a>
-                <a href="/settings">⚙ Settings</a>
-            </div>
-        </div>
-
-        <div class="content">
-            <h1>Welcome Venkat 👋</h1>
-
-            <a href="/profile"><div class="card">👤 Profile</div></a>
-            <a href="/orders"><div class="card">📦 Orders</div></a>
-            <a href="/settings"><div class="card">⚙ Settings</div></a>
-        </div>
-
-        <div class="footer">© 2026 FastAPI App</div>
-
-    </body>
-    </html>
+    <h3>Welcome Venkat 👋</h3>
     """
 
 # -------------------------
-# PROFILE PAGE
+# PROFILE
 # -------------------------
 @app.get("/profile", response_class=HTMLResponse)
 def profile():
+    if not check_login():
+        return RedirectResponse("/")
+
     return """
     <h2>Profile 👤</h2>
-    <p><b>Name:</b> Venkat Reddy</p>
-    <p><b>Age:</b> 25</p>
-    <p><b>Email:</b> venkat@gmail.com</p>
-    <br>
-    <a href="/login">Back</a>
+    <p>Name: Venkat Reddy</p>
+    <p>Age: 25</p>
+    <p>Email: venkat@gmail.com</p>
+    <a href="/dashboard">Back</a>
     """
 
 # -------------------------
-# ORDERS PAGE
+# ORDERS
 # -------------------------
 @app.get("/orders", response_class=HTMLResponse)
 def orders():
+    if not check_login():
+        return RedirectResponse("/")
+
     return """
     <h2>Orders 📦</h2>
-    <p>🕐 Pending Orders: 2</p>
-    <p>✅ Delivered Orders: 3</p>
-    <br>
-    <a href="/login">Back</a>
+    <p>Pending: 2</p>
+    <p>Delivered: 3</p>
+    <a href="/dashboard">Back</a>
     """
 
 # -------------------------
-# SETTINGS PAGE
+# SETTINGS
 # -------------------------
 @app.get("/settings", response_class=HTMLResponse)
 def settings():
+    if not check_login():
+        return RedirectResponse("/")
+
     return """
     <h2>Settings ⚙</h2>
-
     <ul>
-        <li>👤 Manage Profile</li>
-        <li>💳 Payments</li>
-        <li>📧 Change Email</li>
-        <li>📱 Change Number</li>
-        <li>🚪 Logout</li>
+        <li>Manage Profile</li>
+        <li>Payments</li>
+        <li>Change Email</li>
+        <li>Change Number</li>
+        <li><a href="/logout">Logout</a></li>
     </ul>
-
-    <a href="/">Logout</a>
     """
+
+# -------------------------
+# LOGOUT (CLEAR SESSION)
+# -------------------------
+@app.get("/logout")
+def logout():
+    sessions.clear()
+    return RedirectResponse("/")
