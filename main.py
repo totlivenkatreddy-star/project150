@@ -1,8 +1,7 @@
-from dict import employees
-print("🔥 Jenkins pipeline is working successfully!")
-print("Hello from VenkatReddy project 🚀")
+from fastapi import FastAPI
 
-print("venkat reddy auto build test ")
-print("-------------------------------")
-for employee in employees:
-    print(employee,)
+app = FastAPI()
+
+@app.get("/")
+def home():
+    return {"message": "Working"}
