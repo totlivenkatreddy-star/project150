@@ -7,29 +7,40 @@ app = FastAPI()
 sessions = {}
 
 # -------------------------
-# LOGIN PAGE (WITH CSS + FORGOT PASSWORD)
+# LOGIN PAGE (HEADER + FOOTER + FORGOT PASSWORD)
 # -------------------------
 @app.get("/", response_class=HTMLResponse)
 def login_page():
     return """
     <html>
     <head>
-        <title>Login</title>
+        <title>TaskManager Login</title>
         <style>
             body {
                 font-family: Arial;
+                margin: 0;
                 background: #f2f2f2;
-                text-align: center;
-                margin-top: 100px;
             }
 
+            /* HEADER */
+            .header {
+                background: #2c3e50;
+                color: white;
+                padding: 15px;
+                text-align: center;
+                font-size: 20px;
+                font-weight: bold;
+            }
+
+            /* LOGIN BOX */
             .box {
                 background: white;
                 padding: 30px;
                 width: 300px;
-                margin: auto;
+                margin: 80px auto;
                 border-radius: 10px;
                 box-shadow: 0px 0px 10px gray;
+                text-align: center;
             }
 
             input {
@@ -54,12 +65,30 @@ def login_page():
                 color: blue;
                 text-decoration: none;
             }
+
+            /* FOOTER */
+            .footer {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                background: #2c3e50;
+                color: white;
+                text-align: center;
+                padding: 10px;
+                font-size: 12px;
+            }
         </style>
     </head>
 
     <body>
+
+        <div class="header">
+            TaskManager Application
+        </div>
+
         <div class="box">
             <h2>Login</h2>
+
             <form action="/login" method="post">
                 <input name="username" placeholder="Username"><br>
                 <input name="password" type="password" placeholder="Password"><br>
@@ -68,6 +97,11 @@ def login_page():
 
             <a class="forgot" href="/forgot-password">Forgot Password?</a>
         </div>
+
+        <div class="footer">
+            © 2026 TaskManager App | All Rights Reserved | License: Demo-12345-XYZ
+        </div>
+
     </body>
     </html>
     """
@@ -141,7 +175,7 @@ def forgot_password_page():
     """
 
 # -------------------------
-# SEND RESET LINK ACTION
+# SEND RESET LINK
 # -------------------------
 @app.post("/send-reset-link")
 def send_reset_link(email: str = Form(...)):
@@ -234,7 +268,7 @@ def dashboard():
             <a href="/settings"><div class="card">⚙ Settings</div></a>
         </div>
 
-        <div class="footer">© 2026 FastAPI App</div>
+        <div class="footer">© 2026 TaskManager App</div>
 
     </body>
     </html>
