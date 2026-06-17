@@ -2,15 +2,12 @@ from fastapi import FastAPI, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 app = FastAPI()
-#venkat reddy
 
-# -------------------------
 # SIMPLE SESSION STORE
-# -------------------------
 sessions = {}
 
 # -------------------------
-# LOGIN PAGE (WITH CSS)
+# LOGIN PAGE (WITH CSS + FORGOT PASSWORD)
 # -------------------------
 @app.get("/", response_class=HTMLResponse)
 def login_page():
@@ -49,6 +46,14 @@ def login_page():
                 border: none;
                 cursor: pointer;
             }
+
+            .forgot {
+                display: block;
+                margin-top: 10px;
+                font-size: 14px;
+                color: blue;
+                text-decoration: none;
+            }
         </style>
     </head>
 
@@ -60,6 +65,8 @@ def login_page():
                 <input name="password" type="password" placeholder="Password"><br>
                 <button>Login</button>
             </form>
+
+            <a class="forgot" href="/forgot-password">Forgot Password?</a>
         </div>
     </body>
     </html>
@@ -79,14 +86,79 @@ def login(username: str = Form(...), password: str = Form(...)):
 
 
 # -------------------------
-# CHECK LOGIN
+# FORGOT PASSWORD PAGE
 # -------------------------
+@app.get("/forgot-password", response_class=HTMLResponse)
+def forgot_password_page():
+    return """
+    <html>
+    <head>
+        <title>Forgot Password</title>
+        <style>
+            body {
+                font-family: Arial;
+                background: #f2f2f2;
+                text-align: center;
+                margin-top: 100px;
+            }
+
+            .box {
+                background: white;
+                padding: 30px;
+                width: 300px;
+                margin: auto;
+                border-radius: 10px;
+                box-shadow: 0px 0px 10px gray;
+            }
+
+            input {
+                width: 90%;
+                padding: 10px;
+                margin: 10px 0;
+            }
+
+            button {
+                width: 100%;
+                padding: 10px;
+                background: orange;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="box">
+            <h2>Reset Password</h2>
+            <form action="/send-reset-link" method="post">
+                <input name="email" type="email" placeholder="Enter your email"><br>
+                <button>Send Reset Link</button>
+            </form>
+        </div>
+    </body>
+    </html>
+    """
+
+# -------------------------
+# SEND RESET LINK ACTION
+# -------------------------
+@app.post("/send-reset-link")
+def send_reset_link(email: str = Form(...)):
+    return HTMLResponse(f"""
+        <h2>Reset Link Sent 📩</h2>
+        <p>If this email exists: <b>{email}</b>, you will receive a reset link.</p>
+        <a href="/">Back to Login</a>
+    """)
+
+
+# CHECK LOGIN
 def check_login():
     return sessions.get("user")
 
 
 # -------------------------
-# DASHBOARD (WITH CSS)
+# DASHBOARD
 # -------------------------
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard():
@@ -168,59 +240,32 @@ def dashboard():
     </html>
     """
 
-# -------------------------
+
 # PROFILE
-# -------------------------
 @app.get("/profile", response_class=HTMLResponse)
 def profile():
     if not check_login():
         return RedirectResponse("/")
+    return "<h2>Profile 👤</h2><a href='/dashboard'>Back</a>"
 
-    return """
-    <h2>Profile 👤</h2>
-    <p>Name: Venkat Reddy</p>
-    <p>Age: 25</p>
-    <p>Email: venkat@gmail.com</p>
-    <a href="/dashboard">Back</a>
-    """
 
-# -------------------------
 # ORDERS
-# -------------------------
 @app.get("/orders", response_class=HTMLResponse)
 def orders():
     if not check_login():
         return RedirectResponse("/")
+    return "<h2>Orders 📦</h2><a href='/dashboard'>Back</a>"
 
-    return """
-    <h2>Orders 📦</h2>
-    <p>Pending: 2</p>
-    <p>Delivered: 3</p>
-    <a href="/dashboard">Back</a>
-    """
 
-# -------------------------
 # SETTINGS
-# -------------------------
 @app.get("/settings", response_class=HTMLResponse)
 def settings():
     if not check_login():
         return RedirectResponse("/")
+    return "<h2>Settings ⚙</h2><a href='/dashboard'>Back</a>"
 
-    return """
-    <h2>Settings ⚙</h2>
-    <ul>
-        <li>Manage Profile</li>
-        <li>Payments</li>
-        <li>Change Email</li>
-        <li>Change Number</li>
-        <li><a href="/logout">Logout</a></li>
-    </ul>
-    """
 
-# -------------------------
 # LOGOUT
-# -------------------------
 @app.get("/logout")
 def logout():
     sessions.clear()
