@@ -1,22 +1,36 @@
-users  = ["venkat","reddy ", "totli", 2, 3,4,5,6]
-#append method in list
-users.append("tvr")
+# # # def outer():
+# # #     def inner():
+# # #         print("inner function")
 
-print(users)
-for i in users:
-    print(i)
-#insert method in list
-users.insert(2,"babu") 
-print(users)   
+# # #     inner()
 
-#remove method in list
+# # #  outer()
+# #========================================================
+# # def outer():
 
-users.remove("babu")
-print(users)
 
-#remove by index
-users.pop(3)
-print(users)
+# #     def inner():
+# #         print("this is inner function")
 
-#length method in list
-print(len(users))
+
+# #     return inner()
+# # result= outer()
+# # print(result)    
+# #==========================================================
+# #decorators manually 
+
+# def decorator(func):
+#     def wrapper():
+#         print("before functon")
+#         func()
+#         print("after function")
+#     return wrapper
+
+
+# def hello():
+#     print("hello venkat")
+
+# hello = decorator(hello)
+
+# hello()
+#=======================================================
