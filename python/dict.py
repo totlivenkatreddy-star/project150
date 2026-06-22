@@ -48,6 +48,3 @@ for employee in employees:
     print(employee,)
     '''
 print(employees[0]["name"])
-print(employees[1])
-employees[1]=3
-print(employees[1])
